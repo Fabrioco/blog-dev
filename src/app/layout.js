@@ -2,6 +2,7 @@ import { Montserrat } from "next/font/google";
 import "./globals.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { AnimatePresence } from "framer-motion";
 
 const montserrat = Montserrat({ subsets: ["latin"] });
 
@@ -16,8 +17,10 @@ export default function RootLayout({ children }) {
       <body
         className={`${montserrat.className} antialiased container min-h-screen flex flex-col items-center justify-center px-4 py-2`}
       >
-        <ToastContainer />
-        {children}
+        <AnimatePresence mode="wait">
+          <ToastContainer />
+          {children}
+        </AnimatePresence>
       </body>
     </html>
   );
