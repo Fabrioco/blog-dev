@@ -29,12 +29,11 @@ export default function RegisterPage() {
       });
 
       const data = await res.json();
-
       if (res.ok) {
-        toast.success("Cadastro realizado com sucesso!");
+        const token = data.token;
+        document.cookie = `token=${token};path=/`;
         router.push("/");
-      } else {
-        toast.error(data.message);
+        toast.success("Login realizado com sucesso!");
       }
     } catch (error) {
       console.log("Erro no fetch", error);

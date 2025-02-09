@@ -27,7 +27,6 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
-      console.log(data);
       if (res.ok) {
         const token = data.token;
         document.cookie = `token=${token};path=/`;
