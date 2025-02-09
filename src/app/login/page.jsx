@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { toast } from "react-toastify";
+import { motion } from 'framer-motion'
 
 export default function LoginPage() {
   const router = useRouter();
@@ -42,19 +43,17 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="w-full h-full flex flex- items-center justify-center gap-10">
-      <div className="hidden  w-[500px] h-[600px] md:grid grid-cols-2 shadow-xl rounded-2xl ">
-        <div className="w-full h-full bg-gradient-to-tr from-blue-600 via-blue-400 to-blue-600 rounded-tl-2xl"></div>
-        <div className="w-full h-full bg-gradient-to-tl from-blue-600 via-blue-400 to-blue-600 rounded-tr-2xl"></div>
-        <div className="w-full h-full bg-gradient-to-br from-blue-600 via-blue-400 to-blue-600 rounded-bl-2xl"></div>
-        <div className="w-full h-full bg-gradient-to-bl from-blue-600 via-blue-400 to-blue-600 rounded-br-2xl"></div>
-      </div>
-      <div className="flex flex-col items-center justify-center w-11/12 h-auto md:w-1/2 xl:w-1/4">
+    <motion.div initial={{ x: "100vw", opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      exit={{ x: "-100vw", opacity: 0 }}
+      transition={{ type: "tween", duration: 0.5 }}>
+      <div className="flex flex-col items-center justify-center w-full h-full">
+
         <h1 className="text-3xl font-bold">
           Login <span className="text-blue-600">{logo}</span>
         </h1>
         <form
-          className="flex flex-col items-center justify-center gap-4 w-full h-auto border-2 border-gray-300 p-4 rounded-lg mt-5 shadow-md"
+          className="flex flex-col items-center justify-center gap-4 w-11/12 h-auto border-2 border-gray-300 p-4 rounded-lg mt-5 shadow-md"
           onSubmit={handleLogin}
         >
           <input
@@ -84,6 +83,6 @@ export default function LoginPage() {
         </form>
 
       </div>
-    </div>
+    </motion.div>
   );
 }
