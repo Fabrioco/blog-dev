@@ -19,22 +19,20 @@ export default function LoginPage() {
 
     try {
       setIsLoading(true);
-      await fetch("http://localhost:5000/api/auth/login", {
+      const res = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
-      })
-        .then((res) => {
-          if (res.ok) {
-            toast.success("Login realizado com sucesso!");
-            router.push("/");
-          }
-        })
-        .catch((error) => {
-          toast.error(error.message);
-        });
+      });
+      const data = await res.json();
+      if (res.ok) {
+        const token = data.token;
+        document.cookie = `token=${token};path=/`;
+        router.push("/");
+        toast.success("Login realizado com sucesso!");
+      }
     } catch (error) {
       toast.error(error.message);
       console.log(error);
