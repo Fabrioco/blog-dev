@@ -1,13 +1,15 @@
 "use client";
 import { useAuthentication } from "@/hooks/useAuthentication";
 import { useRouter } from "next/navigation";
-import { PlusCircle } from "@phosphor-icons/react";
+import { Chat, PlusCircle } from "@phosphor-icons/react";
 import React from "react";
+import { Heart } from "@phosphor-icons/react/dist/ssr";
 
 export default function IndexPage() {
   const router = useRouter();
   const { user, isLoading } = useAuthentication();
   const [posts, setPosts] = React.useState([]);
+  const [users, setUsers] = React.useState({});
 
   React.useEffect(() => {
     const fetchPosts = async () => {
@@ -19,6 +21,22 @@ export default function IndexPage() {
         const data = await res.json();
         const posts = data.posts;
         setPosts(posts);
+
+        const userRequests = data.posts.map((post) =>
+          fetch(`http://localhost:5000/api/users/${post.user_id}`, {
+            method: "GET",
+            credentials: "include",
+          }).then((res) =>
+            res
+              .json()
+              .then((data) => ({
+                [post.user_id]: data.user?.name || "Desconhecido",
+              }))
+          )
+        );
+
+        const usersData = await Promise.all(userRequests);
+        setUsers(Object.assign({}, ...usersData));
       } catch (error) {
         console.log(error);
       }
@@ -45,9 +63,23 @@ export default function IndexPage() {
         {posts.map((post) => (
           <div key={post.id} className="border-b border-black">
             {post.image && <img src={post.image} alt={post.title} />}
-            <h2 className="text-2xl font-bold">{post.title}</h2>
+            <h2 className="text-2xl font-bold">
+              {post.title} - {users[post.user_id]}
+            </h2>
+            <button
+              onClick={() => {
+                router.push(`/post/${post.id}`);
+              }}
+            >
+              Ver post
+            </button>
             <p className="text-lg">{post.description}</p>
-            <span>{post.likes}</span>
+            <div className="flex gap-2">
+              <span className="flex gap-2 items-center">
+                <Heart size={32} className="text-red-500 cursor-pointer" />
+                {post.likes}
+              </span>
+            </div>
           </div>
         ))}
       </div>
