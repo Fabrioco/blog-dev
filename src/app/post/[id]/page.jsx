@@ -8,6 +8,7 @@ export default function PostPage() {
 
   const [post, setPost] = React.useState({});
   const [user, setUser] = React.useState({});
+  const [usersComments, setUsersComments] = React.useState([]);
   const [comments, setComments] = React.useState([]);
 
   const fetchPost = async () => {
@@ -19,6 +20,8 @@ export default function PostPage() {
       if (res.ok) {
         const data = await res.json();
         setPost(data.post);
+        fetchUser();
+        fetchComments();
       } else {
         console.log(res);
       }
@@ -35,6 +38,7 @@ export default function PostPage() {
       });
       if (res.ok) {
         const data = await res.json();
+        console.log(data);
         setUser(data.user);
       } else {
         console.log(res);
@@ -56,18 +60,22 @@ export default function PostPage() {
       if (res.ok) {
         const data = await res.json();
         setComments(data.comments);
-        const userRequests = data.comments.map((comment) => {
-          return fetch(`http://localhost:5000/api/users/${comment.user_id}`, {
-            method: "GET",
-            credentials: "include",
-          }).then((res) =>
+        const userRequests = data.comments.map(async (comment) => {
+          return await fetch(
+            `http://localhost:5000/api/users/${comment.user_id}`,
+            {
+              method: "GET",
+              credentials: "include",
+            }
+          ).then((res) =>
             res.json().then((data) => ({
               [comment.user_id]: data.user?.name || "Desconhecido",
             }))
           );
         });
         const usersData = await Promise.all(userRequests);
-        setUser(Object.assign({}, ...usersData));
+        console.log(usersData);
+        setUsersComments(Object.assign({}, ...usersData));
       } else {
         console.log(res);
       }
@@ -78,10 +86,7 @@ export default function PostPage() {
 
   React.useEffect(() => {
     fetchPost();
-    fetchUser();
-    fetchComments();
   }, []);
-
   return (
     <div>
       <h1>{post.title}</h1>
@@ -99,7 +104,7 @@ export default function PostPage() {
         <div key={comment.id}>
           <p>
             <strong className="text-blue-500 text-xl">
-              {user[comment.user_id]}
+              {usersComments[comment.user_id]}
             </strong>{" "}
             - {comment.comment}
           </p>
