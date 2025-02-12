@@ -38,7 +38,6 @@ export default function PostPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        console.log(data);
         setUser(data.user);
       } else {
         console.log(res);
@@ -74,7 +73,6 @@ export default function PostPage() {
           );
         });
         const usersData = await Promise.all(userRequests);
-        console.log(usersData);
         setUsersComments(Object.assign({}, ...usersData));
       } else {
         console.log(res);
