@@ -1,11 +1,11 @@
 "use client";
-import { useAuthentication } from "@/hooks/useAuthentication";
 import { useRouter } from "next/navigation";
 import { Chat, PlusCircle } from "@phosphor-icons/react";
 import React from "react";
 import { Heart } from "@phosphor-icons/react/dist/ssr";
+import { useAuthentication } from "../hooks/useAuthentication";
 
-export default function IndexPage() {
+export default function Home() {
   const router = useRouter();
   const { user, isLoading } = useAuthentication();
   const [posts, setPosts] = React.useState([]);
@@ -27,11 +27,9 @@ export default function IndexPage() {
             method: "GET",
             credentials: "include",
           }).then((res) =>
-            res
-              .json()
-              .then((data) => ({
-                [post.user_id]: data.user?.name || "Desconhecido",
-              }))
+            res.json().then((data) => ({
+              [post.user_id]: data.user?.name || "Desconhecido",
+            }))
           )
         );
 
