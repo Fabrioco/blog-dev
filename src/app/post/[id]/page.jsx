@@ -2,14 +2,16 @@
 import { Heart } from "@phosphor-icons/react";
 import { useParams } from "next/navigation";
 import React from "react";
+import { useAuthentication } from "../../../hooks/useAuthentication";
 
 export default function PostPage() {
   const { id } = useParams();
+  const { user } = useAuthentication();
 
   const [post, setPost] = React.useState({});
-  const [user, setUser] = React.useState({});
   const [usersComments, setUsersComments] = React.useState([]);
   const [comments, setComments] = React.useState([]);
+  const [isLoading, setIsLoading] = React.useState(true);
 
   const fetchPost = async () => {
     try {
@@ -20,30 +22,14 @@ export default function PostPage() {
       if (res.ok) {
         const data = await res.json();
         setPost(data.post);
-        fetchUser();
         fetchComments();
       } else {
         console.log(res);
       }
     } catch (error) {
       console.log(error);
-    }
-  };
-
-  const fetchUser = async () => {
-    try {
-      const res = await fetch(`http://localhost:5000/api/users/${id}`, {
-        method: "GET",
-        credentials: "include",
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data.user);
-      } else {
-        console.log(res);
-      }
-    } catch (error) {
-      console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -85,6 +71,44 @@ export default function PostPage() {
   React.useEffect(() => {
     fetchPost();
   }, []);
+
+  const handleLikePost = async () => {
+    const res = await fetch(`http://localhost:5000/api/posts/like/${id}`, {
+      method: "put",
+      credentials: "include",
+    });
+    if (res.ok) {
+      fetchPost();
+    } else if (!res.ok) {
+      console.log(res);
+    }
+  };
+
+  const handleDislikePost = async () => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/posts/dislike/${id}`, {
+        method: "put",
+        credentials: "include",
+      });
+      if (res.ok) {
+        fetchPost();
+      } else {
+        console.log(res);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const verifyLike = () => {
+    const res = post.likes.includes(user.id);
+    return res;
+  };
+
+  if (isLoading) {
+    return <h1>Carregando...</h1>;
+  }
+
   return (
     <div>
       <h1>{post.title}</h1>
@@ -94,12 +118,21 @@ export default function PostPage() {
         {post.description}
       </p>
       <span className="flex flex-row items-center gap-2">
-        <Heart size={20} className="text-red-500" />
-        {post.likes}
+        {!verifyLike() ? (
+          <Heart size={20} onClick={handleLikePost} className="text-red-500" />
+        ) : (
+          <Heart
+            size={20}
+            className="text-red-500"
+            onClick={handleDislikePost}
+            weight="fill"
+          />
+        )}
+        {post.likes.length}
       </span>
       <h2 className="text-2xl">Comentários</h2>
-      {comments.map((comment) => (
-        <div key={comment.id}>
+      {comments.map((comment, index) => (
+        <div key={index}>
           <p>
             <strong className="text-blue-500 text-xl">
               {usersComments[comment.user_id]}
