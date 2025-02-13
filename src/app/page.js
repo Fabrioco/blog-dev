@@ -75,7 +75,7 @@ export default function Home() {
             <div className="flex gap-2">
               <span className="flex gap-2 items-center">
                 <Heart size={32} className="text-red-500 cursor-pointer" />
-                {post.likes}
+                {post.likes.length}
               </span>
             </div>
           </div>
